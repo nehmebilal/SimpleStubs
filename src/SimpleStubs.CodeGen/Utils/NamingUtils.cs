@@ -4,14 +4,25 @@ using System.Text;
 
 namespace Etg.SimpleStubs.CodeGen.Utils
 {
-    class NamingUtils
+    internal class NamingUtils
     {
         public string GetInterfaceStubName(string interfaceName)
         {
             return "Stub" + interfaceName;
         }
 
-        public static string GetDelegatePropertyName(IMethodSymbol methodSymbol, INamedTypeSymbol targetInterface)
+        public static string GetDelegateTypeName(IMethodSymbol methodSymbol, INamedTypeSymbol targetInterface)
+        {
+            return SerializeMethodName(methodSymbol, targetInterface, string.Empty, "_Delegate");
+        }
+
+        public static string GetSetupMethodName(IMethodSymbol methodSymbol, INamedTypeSymbol targetInterface)
+        {
+            return SerializeMethodName(methodSymbol, targetInterface, "Setup", string.Empty);
+        }
+
+        private static string SerializeMethodName(IMethodSymbol methodSymbol, INamedTypeSymbol targetInterface,
+            string prefix, string postfix)
         {
             string methodName = methodSymbol.Name;
             if (methodSymbol.IsPropertyGetter())
@@ -29,19 +40,22 @@ namespace Etg.SimpleStubs.CodeGen.Utils
                 methodName = SerializeName(methodSymbol.ContainingSymbol) + "_" + methodName;
             }
 
-            if(methodSymbol.IsOrdinaryMethod())
+            if (methodSymbol.IsOrdinaryMethod())
             {
                 if (methodSymbol.Parameters.Any())
                 {
                     methodName = methodName + "_" + string.Join("_", methodSymbol.Parameters.Select(SerializeName));
                 }
             }
-            return methodName;
-        }
 
-        public static string GetDelegateTypeName(string delegatePropertyName)
-        {
-            return delegatePropertyName + "_Delegate";
+            methodName += postfix;
+
+            if (methodSymbol.IsGenericMethod)
+            {
+                methodName =
+                    $"{methodName}<{string.Join(",", methodSymbol.TypeParameters.Select(symbol => symbol.Name))}>";
+            }
+            return prefix + methodName;
         }
 
         public static string SerializeName(ISymbol param)
@@ -66,7 +80,6 @@ namespace Etg.SimpleStubs.CodeGen.Utils
                         {
                             sb.Append(part.Symbol.Name);
                         }
-
                         break;
                 }
             }
