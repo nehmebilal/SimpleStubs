@@ -32,6 +32,8 @@ namespace Etg.SimpleStubs.CodeGen
                 .WithBaseList(RoslynUtils.BaseList(interfaceName))
                 .AddAttributeLists(AttributeListList(Attribute("CompilerGenerated")).ToArray());
 
+	        classDclr = RoslynUtils.CopyGenericConstraints(interfaceType, classDclr);
+
             classDclr = classDclr.AddMembers(
                 SF.FieldDeclaration(
                     SF.VariableDeclaration(SF.ParseTypeName("Dictionary<string, object>"),
@@ -60,7 +62,7 @@ namespace Etg.SimpleStubs.CodeGen
             return cu;
         }
 
-        private static NamespaceDeclarationSyntax GetNamespaceNode(InterfaceDeclarationSyntax interfaceNode)
+	    private static NamespaceDeclarationSyntax GetNamespaceNode(InterfaceDeclarationSyntax interfaceNode)
         {
             var namespaceNode = interfaceNode.Parent as NamespaceDeclarationSyntax;
             if (namespaceNode == null)
