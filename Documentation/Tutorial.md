@@ -105,6 +105,32 @@ var stub = new StubIPhoneBook()
     .MyNumber_Set(value => newNumber = value);
 ```
 
+## Stubbing indexers
+```csharp
+var stub = new StubIGenericContainer<int>();
+
+// stubbing indexer getter
+stub.Item_Get(index =>
+{
+    switch (index)
+    {
+        case 0:
+            return 13;
+        case 1:
+            return 5;
+        default:
+            throw new IndexOutOfRangeException();
+    }
+});
+
+// stubbing indexer setter
+int res = -1;
+stub.Item_Set((index, value) =>
+{
+    res = value;
+});
+```
+
 ## Stubbing events
 
 ```csharp
