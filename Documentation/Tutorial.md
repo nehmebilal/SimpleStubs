@@ -112,21 +112,17 @@ var stub = new StubIGenericContainer<int>();
 // stubbing indexer getter
 stub.Item_Get(index =>
 {
-    switch (index)
-    {
-        case 0:
-            return 13;
-        case 1:
-            return 5;
-        default:
-            throw new IndexOutOfRangeException();
-    }
+    // we're expecting the code under test to get index 5
+    if (index != 5) throw new IndexOutOfRangeException();
+    return 99;
 });
 
 // stubbing indexer setter
 int res = -1;
 stub.Item_Set((index, value) =>
 {
+    // we're expecting the code under test to only use index 7
+    if (index != 7) throw new IndexOutOfRangeException();
     res = value;
 });
 ```
